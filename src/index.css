@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-dark-bg text-slate-100 antialiased font-sans overflow-x-hidden min-h-screen;
+    background-color: #0B0F19;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0F19;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Leaflet Container Dark Customization */
+.leaflet-container {
+  font-family: inherit !important;
+  background-color: #131B2E !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #131B2E !important;
+  color: #F8FAFC !important;
+  border: 1px solid #2A3655 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: #131B2E !important;
+}
+
+.leaflet-popup-content {
+  margin: 10px 14px !important;
+  line-height: 1.4 !important;
+  font-size: 12px !important;
+}
+
+/* Custom Marker CSS */
+.custom-leaflet-marker {
+  background: transparent;
+  border: none;
+}
+
+.gps-live-marker {
+  background: transparent;
+  border: none;
+}
+
+/* Keyframes for subtle animations */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
+.animate-wiggle {
+  animation: wiggle 0.4s ease-in-out infinite;
+}
