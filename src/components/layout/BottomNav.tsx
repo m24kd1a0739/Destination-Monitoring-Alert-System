@@ -2,6 +2,7 @@ import React from 'react';
 import { 
   Home, 
   MapPin, 
+  Bus,
   Navigation, 
   History, 
   Bookmark, 
@@ -11,7 +12,7 @@ import {
 import { useJourney } from '../../context/JourneyContext';
 import { useSettings } from '../../context/SettingsContext';
 
-export type NavTab = 'dashboard' | 'plan' | 'live' | 'history' | 'favourites' | 'safety' | 'settings';
+export type NavTab = 'dashboard' | 'plan' | 'bus' | 'live' | 'history' | 'favourites' | 'safety' | 'settings';
 
 interface BottomNavProps {
   currentTab: NavTab;
@@ -25,6 +26,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
   const navItems = [
     { id: 'dashboard' as NavTab, label: 'Home', icon: Home },
     { id: 'plan' as NavTab, label: t.planJourney, icon: MapPin },
+    { id: 'bus' as NavTab, label: t.whereIsMyBus, icon: Bus },
     ...(activeJourney
       ? [{ id: 'live' as NavTab, label: 'Live GPS', icon: Navigation, isLive: true }]
       : []),
@@ -39,9 +41,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
       {/* Mobile & Tablet Bottom Navigation Bar */}
       <nav 
         aria-label="Mobile Navigation"
-        className="fixed bottom-0 left-0 right-0 z-40 bg-dark-surface/95 backdrop-blur-lg border-t border-dark-border px-2 py-1.5 md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-40 bg-dark-surface/95 backdrop-blur-lg border-t border-dark-border px-1 py-1 md:hidden shadow-2xl"
       >
-        <div className="flex items-center justify-around">
+        <div className="flex items-center justify-around overflow-x-auto no-scrollbar gap-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentTab === item.id;
@@ -51,7 +53,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
-                className={`relative flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all ${
+                className={`relative flex flex-col items-center justify-center py-1 px-1.5 min-w-[48px] rounded-xl transition-all ${
                   isActive
                     ? 'text-brand-400 font-semibold'
                     : 'text-slate-400 hover:text-slate-200'
@@ -59,13 +61,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
               >
                 {isLive ? (
                   <div className="relative flex items-center justify-center p-1.5 rounded-lg bg-brand-500/20 text-brand-400 -mt-2 shadow-lg shadow-brand-500/30 animate-pulse">
-                    <Icon className="w-5 h-5" />
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full"></span>
+                    <Icon className="w-4 h-4" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full"></span>
                   </div>
                 ) : (
-                  <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''} transition-transform`} />
+                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? 'scale-110' : ''} transition-transform`} />
                 )}
-                <span className="text-[10px] mt-1 tracking-tight truncate max-w-[64px]">
+                <span className="text-[9px] sm:text-[10px] mt-0.5 tracking-tight truncate max-w-[56px]">
                   {item.label}
                 </span>
                 {isActive && !isLive && (

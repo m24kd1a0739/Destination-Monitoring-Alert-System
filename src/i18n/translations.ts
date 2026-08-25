@@ -199,6 +199,43 @@ export interface TranslationSchema {
   delete: string;
   confirm: string;
   back: string;
+
+  // Where is My Bus? Feature
+  whereIsMyBus: string;
+  searchBusRoute: string;
+  enterBusNumber: string;
+  trackBus: string;
+  liveBusTracking: string;
+  demoLiveDataBadge: string;
+  demoDataNotice: string;
+  fromLocation: string;
+  toLocation: string;
+  availableBuses: string;
+  noBusesFound: string;
+  busNotFound: string;
+  busNumber: string;
+  busType: string;
+  currentLocation: string;
+  myStop: string;
+  setMyStop: string;
+  myStopSelected: string;
+  onTime: string;
+  delayed: string;
+  approaching: string;
+  arrived: string;
+  refreshBusLocation: string;
+  shareBusStatus: string;
+  popularRoutes: string;
+  searchByRoute: string;
+  searchByBusNumber: string;
+  liveBusSpeed: string;
+  lastUpdated: string;
+  estimatedArrival: string;
+  stopSequence: string;
+  busArrivedAtStop: (busNo: string, stopName: string) => string;
+  bus5MinAlert: (busNo: string, stopName: string) => string;
+  bus2MinAlert: (busNo: string, stopName: string) => string;
+  shareBusMessage: (busNo: string, route: string, location: string, nextStop: string, eta: string, myStop: string, status: string) => string;
 }
 
 export const translations: Record<Language, TranslationSchema> = {
@@ -407,7 +444,52 @@ export const translations: Record<Language, TranslationSchema> = {
     close: "Close",
     delete: "Delete",
     confirm: "Confirm",
-    back: "Back"
+    back: "Back",
+
+    whereIsMyBus: "Where is My Bus?",
+    searchBusRoute: "Search Bus Route",
+    enterBusNumber: "Enter Bus Number",
+    trackBus: "Track Bus",
+    liveBusTracking: "Live Bus Tracking",
+    demoLiveDataBadge: "Demo Live Data",
+    demoDataNotice: "Simulation active with demo live telemetry. Ready for transit API integration.",
+    fromLocation: "From (e.g. Vizianagaram)",
+    toLocation: "To (e.g. Parvathipuram)",
+    availableBuses: "Available Buses",
+    noBusesFound: "No buses found for this route.",
+    busNotFound: "No active bus found with this registration number.",
+    busNumber: "Bus Number",
+    busType: "Bus Type",
+    currentLocation: "Current Location",
+    myStop: "My Stop",
+    setMyStop: "Set as My Stop",
+    myStopSelected: "My Stop Alert Armed",
+    onTime: "On Time",
+    delayed: "Delayed",
+    approaching: "Approaching",
+    arrived: "Arrived",
+    refreshBusLocation: "Refresh bus location",
+    shareBusStatus: "Share Bus Status",
+    popularRoutes: "Popular Routes",
+    searchByRoute: "Search by Route",
+    searchByBusNumber: "Search by Bus Number",
+    liveBusSpeed: "Live Speed",
+    lastUpdated: "Last Updated",
+    estimatedArrival: "Estimated Arrival",
+    stopSequence: "Bus Stop Sequence",
+    busArrivedAtStop: (busNo: string, stopName: string) => `Bus ${busNo} has arrived at ${stopName}!`,
+    bus5MinAlert: (busNo: string, stopName: string) => `Your bus ${busNo} is approximately 5 minutes away from ${stopName}. Please be ready!`,
+    bus2MinAlert: (busNo: string, stopName: string) => `Urgent Alert: Your bus ${busNo} is arriving in 2 minutes at ${stopName}!`,
+    shareBusMessage: (busNo: string, route: string, location: string, nextStop: string, eta: string, myStop: string, status: string) => 
+      `🚌 *LIVE BUS TRACKING UPDATE*\n\n` +
+      `• *Bus:* ${busNo}\n` +
+      `• *Route:* ${route}\n` +
+      `• *Current Location:* ${location}\n` +
+      `• *Next Stop:* ${nextStop}\n` +
+      `• *Destination / My Stop:* ${myStop}\n` +
+      `• *Expected Arrival:* ${eta}\n` +
+      `• *Status:* ${status}\n\n` +
+      `_Tracked with Destination Monitor_`
   },
 
   te: {
@@ -615,7 +697,52 @@ export const translations: Record<Language, TranslationSchema> = {
     close: "మూసివేయి",
     delete: "తొలగించు",
     confirm: "నిర్ధారించండి",
-    back: "వెనుకకు"
+    back: "వెనుకకు",
+
+    whereIsMyBus: "నా బస్సు ఎక్కడ ఉంది?",
+    searchBusRoute: "బస్సు రూట్ శోధించండి",
+    enterBusNumber: "బస్సు నంబర్ నమోదు చేయండి",
+    trackBus: "బస్సును ట్రాక్ చేయండి",
+    liveBusTracking: "ప్రత్యక్ష బస్సు ట్రాకింగ్",
+    demoLiveDataBadge: "డెమో లైవ్ డేటా",
+    demoDataNotice: "డెమో లైవ్ టెలిమెట్రీతో సిమ్యులేషన్ నడుస్తోంది. రియల్-టైమ్ రవాణా APIకి సిద్ధంగా ఉంది.",
+    fromLocation: "ప్రారంభం (ఉదా: విజయనగరం)",
+    toLocation: "గమ్యం (ఉదా: పార్వతీపురం)",
+    availableBuses: "అందుబాటులో ఉన్న బస్సులు",
+    noBusesFound: "ఈ మార్గంలో ప్రస్తుతం బస్సులు కనుగొనబడలేదు.",
+    busNotFound: "ఈ నంబర్‌తో ఏ బస్సు కనుగొనబడలేదు.",
+    busNumber: "బస్సు నంబర్",
+    busType: "బస్సు రకం",
+    currentLocation: "ప్రస్తుత లొకేషన్",
+    myStop: "నా స్టాప్",
+    setMyStop: "నా స్టాప్‌గా ఎంచుకోండి",
+    myStopSelected: "నా స్టాప్ హెచ్చరిక యాక్టివ్ చేయబడింది",
+    onTime: "సమయానికి ఉంది",
+    delayed: "ఆలస్యమైంది",
+    approaching: "చేరువలో ఉంది",
+    arrived: "చేరుకుంది",
+    refreshBusLocation: "బస్సు లొకేషన్ రిఫ్రెష్ చేయండి",
+    shareBusStatus: "బస్సు స్టేటస్ షేర్ చేయండి",
+    popularRoutes: "ప్రసిద్ధ మార్గాలు",
+    searchByRoute: "రూట్ ద్వారా శోధన",
+    searchByBusNumber: "బస్సు నంబర్ ద్వారా శోధన",
+    liveBusSpeed: "ప్రస్తుత వేగం",
+    lastUpdated: "చివరి నవీకరణ",
+    estimatedArrival: "అంచనా సమయం",
+    stopSequence: "బస్సు స్టాప్‌ల జాబితా",
+    busArrivedAtStop: (busNo: string, stopName: string) => `బస్సు ${busNo} ${stopName} వద్దకు చేరుకుంది!`,
+    bus5MinAlert: (busNo: string, stopName: string) => `మీ బస్సు ${busNo} ${stopName} స్టాప్‌కు 5 నిమిషాల దూరంలో ఉంది. సిద్ధంగా ఉండండి!`,
+    bus2MinAlert: (busNo: string, stopName: string) => `అత్యవసర హెచ్చరిక: మీ బస్సు ${busNo} 2 నిమిషాల్లో ${stopName} స్టాప్‌కు చేరుకోబోతోంది!`,
+    shareBusMessage: (busNo: string, route: string, location: string, nextStop: string, eta: string, myStop: string, status: string) => 
+      `🚌 *ప్రత్యక్ష బస్సు సమాచారం*\n\n` +
+      `• *బస్సు నంబర్:* ${busNo}\n` +
+      `• *రూట్:* ${route}\n` +
+      `• *ప్రస్తుత స్థానం:* ${location}\n` +
+      `• *తదుపరి స్టాప్:* ${nextStop}\n` +
+      `• *నా గమ్యం/స్టాప్:* ${myStop}\n` +
+      `• *చేరే సమయం:* ${eta}\n` +
+      `• *స్థితి:* ${status}\n\n` +
+      `_గమ్యస్థాన పర్యవేక్షణ ద్వారా పంపబడింది_`
   },
 
   hi: {
@@ -823,7 +950,52 @@ export const translations: Record<Language, TranslationSchema> = {
     close: "बंद करें",
     delete: "हटाएं",
     confirm: "पुष्टि करें",
-    back: "पीछे"
+    back: "पीछे",
+
+    whereIsMyBus: "मेरी बस कहाँ है?",
+    searchBusRoute: "बस रूट खोजें",
+    enterBusNumber: "बस नंबर दर्ज करें",
+    trackBus: "बस ट्रैक करें",
+    liveBusTracking: "लाइव बस ट्रैकिंग",
+    demoLiveDataBadge: "डेमो लाइव डेटा",
+    demoDataNotice: "डेमो लाइव टेलीमेट्री सक्रिय है। रियल-टाइम ट्रांसपोर्ट API के लिए तैयार।",
+    fromLocation: "कहाँ से (उदा. विजयनगरम)",
+    toLocation: "कहाँ तक (उदा. पार्वतीपुरम)",
+    availableBuses: "उपलब्ध बसें",
+    noBusesFound: "इस मार्ग पर कोई बस नहीं मिली।",
+    busNotFound: "इस पंजीकरण संख्या वाली कोई बस नहीं मिली।",
+    busNumber: "बस नंबर",
+    busType: "बस प्रकार",
+    currentLocation: "वर्तमान स्थान",
+    myStop: "मेरा स्टॉप",
+    setMyStop: "मेरा स्टॉप सेट करें",
+    myStopSelected: "मेरा स्टॉप अलर्ट सक्रिय",
+    onTime: "समय पर",
+    delayed: "देरी से",
+    approaching: "पहुँचने वाली है",
+    arrived: "पहुँच गई",
+    refreshBusLocation: "बस स्थान रीफ़्रेश करें",
+    shareBusStatus: "बस स्थिति साझा करें",
+    popularRoutes: "लोकप्रिय मार्ग",
+    searchByRoute: "रूट द्वारा खोजें",
+    searchByBusNumber: "बस नंबर द्वारा खोजें",
+    liveBusSpeed: "लाइव गति",
+    lastUpdated: "अंतिम अपडेट",
+    estimatedArrival: "अनुमानित समय",
+    stopSequence: "बस स्टॉप क्रम",
+    busArrivedAtStop: (busNo: string, stopName: string) => `बस ${busNo} ${stopName} पर पहुँच गई है!`,
+    bus5MinAlert: (busNo: string, stopName: string) => `आपकी बस ${busNo} ${stopName} से लगभग 5 मिनट की दूरी पर है। कृपया तैयार रहें!`,
+    bus2MinAlert: (busNo: string, stopName: string) => `तत्काल सूचना: आपकी बस ${busNo} 2 मिनट में ${stopName} पहुँचने वाली है!`,
+    shareBusMessage: (busNo: string, route: string, location: string, nextStop: string, eta: string, myStop: string, status: string) => 
+      `🚌 *लाइव बस ट्रैकिंग अपडेट*\n\n` +
+      `• *बस नंबर:* ${busNo}\n` +
+      `• *रूट:* ${route}\n` +
+      `• *वर्तमान स्थान:* ${location}\n` +
+      `• *अगला स्टॉप:* ${nextStop}\n` +
+      `• *गंतव्य / मेरा स्टॉप:* ${myStop}\n` +
+      `• *अनुमानित आगमन:* ${eta}\n` +
+      `• *स्थिति:* ${status}\n\n` +
+      `_डेस्टिनेशन मॉनिटर द्वारा_`
   },
 
   ta: {
@@ -1031,7 +1203,52 @@ export const translations: Record<Language, TranslationSchema> = {
     close: "மூடு",
     delete: "நீக்கு",
     confirm: "உறுதிப்படுத்து",
-    back: "பின்னால்"
+    back: "பின்னால்",
+
+    whereIsMyBus: "என் பேருந்து எங்கே?",
+    searchBusRoute: "பேருந்து வழியைத் தேடுங்கள்",
+    enterBusNumber: "பேருந்து எண்ணை உள்ளிடவும்",
+    trackBus: "பேருந்தைக் கண்காணிக்கவும்",
+    liveBusTracking: "நேரலை பேருந்து கண்காணிப்பு",
+    demoLiveDataBadge: "டெமோ நேரலை தரவு",
+    demoDataNotice: "டெமோ நேரலை சிமுலேஷன் இயங்குகிறது. நேரடி அரசு போக்குவரத்து API இணைப்புக்கு தயார்.",
+    fromLocation: "புறப்படும் இடம்",
+    toLocation: "சேரும் இடம்",
+    availableBuses: "கிடைக்கும் பேருந்துகள்",
+    noBusesFound: "இந்த வழியில் பேருந்துகள் எதுவும் கிடைக்கவில்லை.",
+    busNotFound: "இந்த எண்ணில் பேருந்து எதுவும் கிடைக்கவில்லை.",
+    busNumber: "பேருந்து எண்",
+    busType: "பேருந்து வகை",
+    currentLocation: "தற்போதைய இடம்",
+    myStop: "என் நிறுத்தம்",
+    setMyStop: "என் நிறுத்தமாக அமை",
+    myStopSelected: "என் நிறுத்த எச்சரிக்கை இயக்கப்பட்டது",
+    onTime: "நேரத்திற்கு",
+    delayed: "தாமதம்",
+    approaching: "நெருங்குகிறது",
+    arrived: "வந்துவிட்டது",
+    refreshBusLocation: "பேருந்து இடத்தை புதுப்பிக்கவும்",
+    shareBusStatus: "பேருந்து நிலையை பகிரவும்",
+    popularRoutes: "பிரபலமான வழிகள்",
+    searchByRoute: "வழி மூலம் தேடவும்",
+    searchByBusNumber: "பேருந்து எண் மூலம் தேடவும்",
+    liveBusSpeed: "நேரலை வேகம்",
+    lastUpdated: "கடைசி புதுப்பிப்பு",
+    estimatedArrival: "எதிர்பார்க்கப்படும் நேரம்",
+    stopSequence: "நிறுத்தங்களின் வரிசை",
+    busArrivedAtStop: (busNo: string, stopName: string) => `பேருந்து ${busNo} ${stopName} நிறுத்தத்திற்கு வந்துவிட்டது!`,
+    bus5MinAlert: (busNo: string, stopName: string) => `உங்கள் பேருந்து ${busNo} ${stopName} நிறுத்தத்திற்கு இன்னும் 5 நிமிடங்களில் வரவுள்ளது. தயாராக இருங்கள்!`,
+    bus2MinAlert: (busNo: string, stopName: string) => `அவசர எச்சரிக்கை: உங்கள் பேருந்து ${busNo} இன்னும் 2 நிமிடங்களில் ${stopName} வந்துவிடும்!`,
+    shareBusMessage: (busNo: string, route: string, location: string, nextStop: string, eta: string, myStop: string, status: string) => 
+      `🚌 *நேரலை பேருந்து கண்காணிப்பு*\n\n` +
+      `• *பேருந்து எண்:* ${busNo}\n` +
+      `• *வழி:* ${route}\n` +
+      `• *தற்போதைய இடம்:* ${location}\n` +
+      `• *அடுத்த நிறுத்தம்:* ${nextStop}\n` +
+      `• *என் நிறுத்தம்:* ${myStop}\n` +
+      `• *வரும் நேரம்:* ${eta}\n` +
+      `• *நிலை:* ${status}\n\n` +
+      `_இலக்கு கண்காணிப்பாளர் மூலம் பகிரப்பட்டது_`
   },
 
   kn: {
@@ -1239,6 +1456,51 @@ export const translations: Record<Language, TranslationSchema> = {
     close: "ಮುಚ್ಚಿ",
     delete: "ಅಳಿಸಿ",
     confirm: "ಖಚಿತಪಡಿಸಿ",
-    back: "ಹಿಂದೆ"
+    back: "ಹಿಂದೆ",
+
+    whereIsMyBus: "ನನ್ನ ಬಸ್ ಎಲ್ಲಿದೆ?",
+    searchBusRoute: "ಬಸ್ ಮಾರ್ಗ ಹುಡುಕಿ",
+    enterBusNumber: "ಬಸ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ",
+    trackBus: "ಬಸ್ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
+    liveBusTracking: "ಲೈವ್ ಬಸ್ ಟ್ರ್ಯಾಕಿಂಗ್",
+    demoLiveDataBadge: "ಡೆಮೊ ಲೈವ್ ಡೇಟಾ",
+    demoDataNotice: "ಡೆಮೊ ಲೈವ್ ಟೆಲಿಮೆಟ್ರಿ ಸಕ್ರಿಯವಾಗಿದೆ. ನೈಜ-ಸಮಯದ ಸಾರಿಗೆ API ಗೆ ಸಿದ್ಧವಾಗಿದೆ.",
+    fromLocation: "ಪ್ರಾರಂಭಿಕ ಸ್ಥಳ",
+    toLocation: "ತಲುಪುವ ಸ್ಥಳ",
+    availableBuses: "ಲಭ್ಯವಿರುವ ಬಸ್‌ಗಳು",
+    noBusesFound: "ಈ ಮಾರ್ಗದಲ್ಲಿ ಯಾವುದೇ ಬಸ್‌ಗಳು ಕಂಡುಬಂದಿಲ್ಲ.",
+    busNotFound: "ಈ ನೋಂದಣಿ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಯಾವುದೇ ಬಸ್ ಕಂಡುಬಂದಿಲ್ಲ.",
+    busNumber: "ಬಸ್ ಸಂಖ್ಯೆ",
+    busType: "ಬಸ್ ಪ್ರಕಾರ",
+    currentLocation: "ಪ್ರಸ್ತುತ ಸ್ಥಳ",
+    myStop: "ನನ್ನ ನಿಲ್ದಾಣ",
+    setMyStop: "ನನ್ನ ನಿಲ್ದಾಣವಾಗಿ ಹೊಂದಿಸಿ",
+    myStopSelected: "ನನ್ನ ನಿಲ್ದಾಣ ಎಚ್ಚರಿಕೆ ಸಕ್ರಿಯವಾಗಿದೆ",
+    onTime: "ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ",
+    delayed: "ವಿಳಂಬ",
+    approaching: "ಸಮೀಪಿಸುತ್ತಿದೆ",
+    arrived: "ತಲುಪಿದೆ",
+    refreshBusLocation: "ಬಸ್ ಸ್ಥಳ ನವೀಕರಿಸಿ",
+    shareBusStatus: "ಬಸ್ ಸ್ಥಿತಿ ಹಂಚಿಕೊಳ್ಳಿ",
+    popularRoutes: "ಜನಪ್ರಿಯ ಮಾರ್ಗಗಳು",
+    searchByRoute: "ಮಾರ್ಗದ ಮೂಲಕ ಹುಡುಕಿ",
+    searchByBusNumber: "ಬಸ್ ಸಂಖ್ಯೆಯ ಮೂಲಕ ಹುಡುಕಿ",
+    liveBusSpeed: "ಲೈವ್ ವೇಗ",
+    lastUpdated: "ಕೊನೆಯ ನವೀಕರಣ",
+    estimatedArrival: "ಅಂದಾಜು ಆಗಮನ",
+    stopSequence: "ಬಸ್ ನಿಲ್ದಾಣಗಳ ಪಟ್ಟಿ",
+    busArrivedAtStop: (busNo: string, stopName: string) => `ಬಸ್ ${busNo} ${stopName} ತಲುಪಿದೆ!`,
+    bus5MinAlert: (busNo: string, stopName: string) => `ನಿಮ್ಮ ಬಸ್ ${busNo} ${stopName} ನಿಲ್ದಾಣಕ್ಕೆ 5 ನಿಮಿಷಗಳ ದೂರದಲ್ಲಿದೆ. ಸಿದ್ಧರಾಗಿರಿ!`,
+    bus2MinAlert: (busNo: string, stopName: string) => `ತುರ್ತು ಎಚ್ಚರಿಕೆ: ನಿಮ್ಮ ಬಸ್ ${busNo} ಇನ್ನೇನು 2 ನಿಮಿಷಗಳಲ್ಲಿ ${stopName} ತಲುಪಲಿದೆ!`,
+    shareBusMessage: (busNo: string, route: string, location: string, nextStop: string, eta: string, myStop: string, status: string) => 
+      `🚌 *ಲೈವ್ ಬಸ್ ಟ್ರ್ಯಾಕಿಂಗ್ ಅಪ್ಡೇಟ್*\n\n` +
+      `• *ಬಸ್ ಸಂಖ್ಯೆ:* ${busNo}\n` +
+      `• *ಮಾರ್ಗ:* ${route}\n` +
+      `• *ಪ್ರಸ್ತುತ ಸ್ಥಳ:* ${location}\n` +
+      `• *ಮುಂದಿನ ನಿಲ್ದಾಣ:* ${nextStop}\n` +
+      `• *ನನ್ನ ನಿಲ್ದಾಣ:* ${myStop}\n` +
+      `• *ಆಗಮನ ಸಮಯ:* ${eta}\n` +
+      `• *ಸ್ಥಿತಿ:* ${status}\n\n` +
+      `_ಗಮ್ಯಸ್ಥಾನ ಮಾನಿಟರ್ ಮೂಲಕ ಹಂಚಿಕೊಳ್ಳಲಾಗಿದೆ_`
   }
 };

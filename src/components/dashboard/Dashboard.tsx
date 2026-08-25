@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   MapPin, 
+  Bus,
   Navigation, 
   Share2, 
   History, 
@@ -323,6 +324,36 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenShare })
       {/* Main Action Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         
+        {/* Where is My Bus? Hero Action Card */}
+        <button
+          onClick={() => onNavigate('bus')}
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-brand-950/70 via-dark-surface to-dark-card border border-brand-500/40 hover:border-brand-400 transition-all text-left group active:scale-[0.99] shadow-xl hover:shadow-brand-500/10 col-span-2 sm:col-span-3 lg:col-span-4"
+        >
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-brand-400 text-white flex items-center justify-center shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform flex-shrink-0">
+              <Bus className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-brand-400 transition-colors">
+                  {t.whereIsMyBus}
+                </h3>
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-brand-500/20 text-brand-300 border border-brand-500/30">
+                  NEW
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                Search live bus routes (e.g. Vizianagaram → Parvathipuram) or track by bus registration number with real-time map & stop arrival alarms.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-1.5 text-xs font-bold text-brand-400 group-hover:text-brand-300 mt-3 sm:mt-0 self-end sm:self-center">
+            <span>Explore Buses</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </button>
+
         {/* Plan Journey */}
         <button
           onClick={() => onNavigate('plan')}

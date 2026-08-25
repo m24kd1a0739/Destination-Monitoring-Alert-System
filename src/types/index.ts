@@ -130,3 +130,6 @@ export interface AlertSettings {
   arrivalRadiusMeters: number;
   offRouteThresholdMeters: number;
 }
+
+export * from './bus';
+

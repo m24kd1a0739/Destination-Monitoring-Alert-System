@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <rect width="512" height="512" rx="128" fill="#0B0F19"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" stroke="#1E293B" stroke-width="8"/>
+  
+  <!-- Outer Pulse Rings -->
+  <circle cx="256" cy="256" r="180" stroke="#0284C7" stroke-opacity="0.25" stroke-width="6" stroke-dasharray="12 12"/>
+  <circle cx="256" cy="256" r="130" stroke="#0284C7" stroke-opacity="0.4" stroke-width="8"/>
+  
+  <!-- Pin & Alert Wave Center -->
+  <path d="M256 120C198.56 120 152 166.56 152 224C152 296 256 400 256 400C256 400 360 296 360 224C360 166.56 313.44 120 256 120Z" fill="url(#brandGrad)"/>
+  <circle cx="256" cy="224" r="44" fill="#0B0F19"/>
+  <circle cx="256" cy="224" r="24" fill="url(#ringGrad)"/>
+  
+  <!-- Sound/Alert Waves -->
+  <path d="M380 180C405 205 405 245 380 270" stroke="#38BDF8" stroke-width="12" stroke-linecap="round"/>
+  <path d="M132 180C107 205 107 245 132 270" stroke="#38BDF8" stroke-width="12" stroke-linecap="round"/>
+</svg>

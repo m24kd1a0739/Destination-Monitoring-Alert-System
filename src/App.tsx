@@ -20,6 +20,7 @@ import { SOSModal } from './components/safety/SOSModal';
 import { JourneyHistoryView } from './components/history/JourneyHistoryView';
 import { FavouriteRoutesView } from './components/favourites/FavouriteRoutesView';
 import { SettingsView } from './components/settings/SettingsView';
+import { BusTrackingView } from './components/bus/BusTrackingView';
 import { FavouriteRoute } from './types';
 
 const MainApp: React.FC = () => {
@@ -30,8 +31,7 @@ const MainApp: React.FC = () => {
     showToast, 
     isArrivalModalOpen, 
     closeArrivalModal,
-    startJourney,
-    availableRoutes
+    startJourney
   } = useJourney();
 
   const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
@@ -81,6 +81,10 @@ const MainApp: React.FC = () => {
             <PlanJourney 
               onStartSuccess={() => setCurrentTab('live')} 
             />
+          )}
+
+          {currentTab === 'bus' && (
+            <BusTrackingView />
           )}
 
           {currentTab === 'live' && (

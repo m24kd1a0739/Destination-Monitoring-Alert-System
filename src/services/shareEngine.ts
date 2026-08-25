@@ -17,7 +17,8 @@ export class ShareEngine {
     const coords = journey.currentLocation || { lat: journey.source.lat, lng: journey.source.lng };
     const mapUrl = this.formatMapUrl(coords.lat, coords.lng);
     const etaStr = journey.eta.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const statusStr = t[(`${journey.status}Status` as keyof typeof t) as any] || journey.status.toUpperCase();
+    const statusKey = `${journey.status}Status`;
+    const statusStr = (t as Record<string, any>)[statusKey] || journey.status.toUpperCase();
 
     return t.shareLiveMessage(
       user.name,
