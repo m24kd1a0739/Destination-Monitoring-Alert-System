@@ -129,6 +129,16 @@ export const LoginModal: React.FC = () => {
             <span>{t.continueBtn}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
+
+          {/* Instant Guest Access Button */}
+          <button
+            type="button"
+            onClick={() => login('Passenger', '+91 98765 43210')}
+            className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium text-xs border border-slate-700 flex items-center justify-center space-x-2 transition-colors"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+            <span>Instant Access / Explore Dashboard</span>
+          </button>
         </form>
 
         <p className="text-[11px] text-slate-500 text-center mt-5">

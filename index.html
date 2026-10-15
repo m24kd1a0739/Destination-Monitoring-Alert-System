@@ -22,12 +22,23 @@
     <title>DESTINATION MONITOR — Passenger Alert System</title>
   </head>
   <body class="bg-dark-bg text-slate-100 min-h-screen antialiased selection:bg-brand-500 selection:text-white font-sans overflow-x-hidden">
-    <div id="root"></div>
+    <div id="root">
+      <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #0b0f19; color: #94a3b8; font-family: 'Inter', system-ui, sans-serif;">
+        <div style="width: 48px; height: 48px; border: 3px solid rgba(59, 130, 246, 0.2); border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+        <div style="margin-top: 16px; font-weight: 600; color: #f1f5f9; letter-spacing: 0.05em;">DESTINATION MONITOR</div>
+        <div style="margin-top: 4px; font-size: 13px;">Initializing alert system...</div>
+      </div>
+      <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+      </style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(err => {
+          navigator.serviceWorker.register('/sw.js').then((reg) => {
+            reg.update();
+          }).catch(err => {
             console.log('SW registration note:', err);
           });
         });
