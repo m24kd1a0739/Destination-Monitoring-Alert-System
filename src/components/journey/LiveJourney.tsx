@@ -27,14 +27,16 @@ import { StopList } from './StopList';
 interface LiveJourneyProps {
   onOpenShare: () => void;
   onOpenDelayShare: () => void;
+  onNavigateToPlan?: () => void;
 }
 
-export const LiveJourney: React.FC<LiveJourneyProps> = ({ onOpenShare, onOpenDelayShare }) => {
+export const LiveJourney: React.FC<LiveJourneyProps> = ({ onOpenShare, onOpenDelayShare, onNavigateToPlan }) => {
   const { user } = useAuth();
   const { t, alertSettings, voiceLanguage } = useSettings();
   const { 
     activeJourney, 
     currentGPS, 
+    refreshGPS,
     stopJourney, 
     pauseJourney, 
     resumeJourney, 
@@ -47,10 +49,76 @@ export const LiveJourney: React.FC<LiveJourneyProps> = ({ onOpenShare, onOpenDel
 
   if (!activeJourney) {
     return (
-      <div className="text-center py-16 px-4 bg-dark-surface border border-dark-border rounded-3xl p-8 max-w-md mx-auto">
-        <Navigation className="w-12 h-12 text-slate-500 mx-auto mb-3 opacity-50" />
-        <h3 className="text-lg font-bold text-white mb-1">No Active Journey</h3>
-        <p className="text-xs text-slate-400 mb-6">{t.noActiveJourney}</p>
+      <div className="space-y-6 pb-20">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-dark-surface border border-dark-border rounded-3xl p-5 shadow-xl">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 rounded-2xl bg-gradient-to-tr from-brand-600 to-brand-400 text-white shadow-lg shadow-brand-500/25 flex-shrink-0">
+              <Compass className="w-6 h-6 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-400">
+                  Live GPS Telemetry
+                </span>
+                <span className="text-slate-600">•</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  Standby
+                </span>
+              </div>
+              <h2 className="text-base sm:text-lg font-bold text-white mt-0.5">
+                {currentGPS ? `Lat: ${currentGPS.lat.toFixed(4)}, Lng: ${currentGPS.lng.toFixed(4)}` : 'Acquiring GPS Signal...'}
+              </h2>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => refreshGPS()}
+              className="py-2 px-3.5 rounded-xl bg-dark-card hover:bg-dark-hover text-slate-200 border border-dark-border text-xs font-semibold flex items-center space-x-1.5 transition-colors shadow-sm"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-brand-400" />
+              <span>Refresh Fix</span>
+            </button>
+            {onNavigateToPlan && (
+              <button
+                onClick={onNavigateToPlan}
+                className="py-2 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-500/20 flex items-center space-x-1.5 transition-all"
+              >
+                <Navigation className="w-3.5 h-3.5" />
+                <span>Plan Journey</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Live GPS Map */}
+        <LiveMap
+          currentGPS={currentGPS}
+          source={null}
+          destination={null}
+          selectedRoute={null}
+          className="h-[380px] sm:h-[460px]"
+        />
+
+        {/* Telemetry Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-4 rounded-2xl bg-dark-surface border border-dark-border">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Status</span>
+            <p className="text-sm font-bold text-emerald-400">{currentGPS ? 'Position Locked' : 'Searching...'}</p>
+          </div>
+          <div className="p-4 rounded-2xl bg-dark-surface border border-dark-border">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Accuracy</span>
+            <p className="text-sm font-bold text-brand-400">{currentGPS ? `±${Math.round(currentGPS.accuracy || 10)} meters` : 'N/A'}</p>
+          </div>
+          <div className="p-4 rounded-2xl bg-dark-surface border border-dark-border">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Speed</span>
+            <p className="text-sm font-bold text-white">{currentGPS?.speed ? `${Math.round(currentGPS.speed * 3.6)} km/h` : '0 km/h'}</p>
+          </div>
+          <div className="p-4 rounded-2xl bg-dark-surface border border-dark-border">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Heading</span>
+            <p className="text-sm font-bold text-slate-300">{currentGPS?.heading ? `${Math.round(currentGPS.heading)}°` : 'Stationary'}</p>
+          </div>
+        </div>
       </div>
     );
   }

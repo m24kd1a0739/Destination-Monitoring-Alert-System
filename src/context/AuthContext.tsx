@@ -14,8 +14,15 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const DEFAULT_GUEST_USER: UserProfile = {
+  name: 'Passenger',
+  phone: '+91 98765 43210',
+  onboardingCompleted: true,
+  createdAt: '2026-01-01T00:00:00.000Z'
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(() => storage.getUserProfile());
+  const [user, setUser] = useState<UserProfile>(() => storage.getUserProfile() || DEFAULT_GUEST_USER);
 
   useEffect(() => {
     const saved = storage.getUserProfile();
@@ -30,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const newUser: UserProfile = {
       name: trimmedName,
       phone: trimmedPhone,
-      onboardingCompleted: user ? user.onboardingCompleted : false,
+      onboardingCompleted: true,
       createdAt: new Date().toISOString()
     };
     storage.saveUserProfile(newUser);
@@ -38,7 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateProfile = (name: string, phone: string) => {
-    if (!user) return;
     const updated: UserProfile = {
       ...user,
       name: name.trim(),
@@ -49,7 +55,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const completeOnboarding = () => {
-    if (!user) return;
     const updated: UserProfile = {
       ...user,
       onboardingCompleted: true
@@ -60,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     storage.clearUserProfile();
-    setUser(null);
+    setUser(DEFAULT_GUEST_USER);
   };
 
   return (

@@ -39,15 +39,6 @@ const MainApp: React.FC = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isDelayModalOpen, setIsDelayModalOpen] = useState(false);
 
-  // If not logged in, show Login
-  if (!isAuthenticated || !user) {
-    return <LoginModal />;
-  }
-
-  // If first-time onboarding not done, show Onboarding
-  if (!isOnboardingCompleted) {
-    return <OnboardingModal />;
-  }
 
   const handleStartFavourite = (fav: FavouriteRoute) => {
     setCurrentTab('plan');
@@ -91,6 +82,7 @@ const MainApp: React.FC = () => {
             <LiveJourney 
               onOpenShare={() => setIsShareModalOpen(true)}
               onOpenDelayShare={() => setIsDelayModalOpen(true)}
+              onNavigateToPlan={() => setCurrentTab('plan')}
             />
           )}
 

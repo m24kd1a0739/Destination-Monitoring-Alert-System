@@ -34,13 +34,24 @@
     </div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      // Emergency cache-buster: Unregister legacy service workers and clear caches
+      // to immediately recover users whose browsers cached obsolete JavaScript hashes
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then((reg) => {
-            reg.update();
-          }).catch(err => {
-            console.log('SW registration note:', err);
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var i = 0; i < registrations.length; i++) {
+            registrations[i].unregister();
+          }
+        }).catch(function(e) {
+          console.warn('SW cleanup notice:', e);
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(keys) {
+          keys.forEach(function(key) {
+            caches.delete(key);
           });
+        }).catch(function(e) {
+          console.warn('Cache purge notice:', e);
         });
       }
     </script>

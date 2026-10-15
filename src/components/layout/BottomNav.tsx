@@ -27,9 +27,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
     { id: 'dashboard' as NavTab, label: 'Home', icon: Home },
     { id: 'plan' as NavTab, label: t.planJourney, icon: MapPin },
     { id: 'bus' as NavTab, label: t.whereIsMyBus, icon: Bus },
-    ...(activeJourney
-      ? [{ id: 'live' as NavTab, label: 'Live GPS', icon: Navigation, isLive: true }]
-      : []),
+    { id: 'live' as NavTab, label: 'Live GPS', icon: Navigation, isLive: !!activeJourney },
     { id: 'history' as NavTab, label: 'History', icon: History },
     { id: 'favourites' as NavTab, label: 'Saved', icon: Bookmark },
     { id: 'safety' as NavTab, label: 'Safety', icon: ShieldCheck },
