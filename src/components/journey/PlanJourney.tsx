@@ -7,6 +7,8 @@ import {
   Compass, 
   Sparkles, 
   AlertTriangle, 
+  AlertCircle,
+  RotateCcw,
   Bookmark, 
   Check, 
   Loader2, 
@@ -15,7 +17,7 @@ import {
 import { useJourney } from '../../context/JourneyContext';
 import { useSettings } from '../../context/SettingsContext';
 import { reverseGeocode, searchPlaces } from '../../services/geocoding';
-import { fetchRealRoutes } from '../../services/routing';
+import { fetchRealRoutesWithDiagnostics } from '../../services/routing';
 import { LocationPlace, RouteOption, TravelMode } from '../../types';
 import { LiveMap } from './LiveMap';
 import { RouteAlternativePicker } from './RouteAlternativePicker';
@@ -49,6 +51,7 @@ export const PlanJourney: React.FC<PlanJourneyProps> = ({ onStartSuccess }) => {
   const [travelMode, setTravelMode] = useState<TravelMode>('bus');
   const [availableRoutes, setAvailableRoutes] = useState<RouteOption[]>([]);
   const [selectedRoute, setSelectedRoute] = useState<RouteOption | null>(null);
+  const [routeError, setRouteError] = useState<string | null>(null);
   const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
   const [mapPickerTarget, setMapPickerTarget] = useState<'source' | 'dest' | null>(null);
   const [favRouteName, setFavRouteName] = useState('');
@@ -133,22 +136,29 @@ export const PlanJourney: React.FC<PlanJourneyProps> = ({ onStartSuccess }) => {
     } else {
       setAvailableRoutes([]);
       setSelectedRoute(null);
+      setRouteError(null);
     }
   }, [sourcePlace, destPlace, travelMode]);
 
   const calculateRoute = async (src: LocationPlace, dst: LocationPlace, mode: TravelMode) => {
     setIsCalculatingRoute(true);
+    setRouteError(null);
     try {
-      const routes = await fetchRealRoutes(src, dst, mode);
-      setAvailableRoutes(routes);
-      if (routes.length > 0) {
-        setSelectedRoute(routes[0]);
+      const res = await fetchRealRoutesWithDiagnostics(src, dst, mode);
+      setAvailableRoutes(res.routes);
+      if (res.routes.length > 0) {
+        setSelectedRoute(res.routes[0]);
+        setRouteError(null);
       } else {
         setSelectedRoute(null);
-        showToast(t.appName, t.noRouteFound, 'warning');
+        const errMsg = res.error || t.noRouteFound;
+        setRouteError(errMsg);
+        showToast(t.appName, errMsg, 'warning');
       }
-    } catch (err) {
-      showToast(t.appName, 'Failed to fetch routing data', 'warning');
+    } catch (err: any) {
+      const msg = err.message || 'Failed to fetch routing data';
+      setRouteError(msg);
+      showToast(t.appName, msg, 'warning');
     } finally {
       setIsCalculatingRoute(false);
     }
@@ -364,6 +374,27 @@ export const PlanJourney: React.FC<PlanJourneyProps> = ({ onStartSuccess }) => {
         <div className="p-4 rounded-2xl bg-dark-surface border border-dark-border flex items-center justify-center space-x-2 text-xs text-brand-400">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>{t.calculatingRoute}</span>
+        </div>
+      )}
+
+      {/* Route Calculation Failure / Provider Diagnostic Notice */}
+      {routeError && !isCalculatingRoute && sourcePlace && destPlace && (
+        <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-600/40 text-amber-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+          <div className="flex items-start sm:items-center space-x-2.5">
+            <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5 sm:mt-0" />
+            <div>
+              <p className="font-semibold text-white">Route Calculation Unavailable</p>
+              <p className="text-[11px] text-amber-300/90">{routeError}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => calculateRoute(sourcePlace, destPlace, travelMode)}
+            className="self-end sm:self-center px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs flex items-center gap-1.5 transition-colors shadow-sm"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Retry Route</span>
+          </button>
         </div>
       )}
 

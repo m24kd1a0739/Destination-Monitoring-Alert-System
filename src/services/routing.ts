@@ -8,6 +8,20 @@ const OSRM_PROFILES: Record<TravelMode, string> = {
   train: 'driving'
 };
 
+// Validate that coordinate pair is numerical and inside geographical limits
+export function isValidCoordinate(lat: number, lng: number): boolean {
+  return (
+    typeof lat === 'number' &&
+    typeof lng === 'number' &&
+    !isNaN(lat) &&
+    !isNaN(lng) &&
+    lat >= -90 &&
+    lat <= 90 &&
+    lng >= -180 &&
+    lng <= 180
+  );
+}
+
 // Haversine distance in meters between two lat/lng pairs
 export function calculateHaversineDistance(
   lat1: number,
@@ -15,6 +29,7 @@ export function calculateHaversineDistance(
   lat2: number,
   lon2: number
 ): number {
+  if (!isValidCoordinate(lat1, lon1) || !isValidCoordinate(lat2, lon2)) return 0;
   const R = 6371e3; // Earth radius in meters
   const φ1 = (lat1 * Math.PI) / 180;
   const φ2 = (lat2 * Math.PI) / 180;
@@ -123,77 +138,146 @@ export function calculateRemainingPolylineDistance(
   return Math.round(distance);
 }
 
+export interface RoutingFetchResult {
+  routes: RouteOption[];
+  error?: string;
+}
+
+/**
+ * Fetch real route options from routing providers.
+ * Includes timeout control, coordinate validation, and fallback server retry.
+ */
 export async function fetchRealRoutes(
   source: LocationPlace,
   destination: LocationPlace,
   mode: TravelMode
 ): Promise<RouteOption[]> {
-  const profile = OSRM_PROFILES[mode];
-  const coordinates = `${source.lng},${source.lat};${destination.lng},${destination.lat}`;
-  const url = `https://router.project-osrm.org/route/v1/${profile}/${coordinates}?overview=full&geometries=geojson&steps=true&alternatives=true`;
+  const result = await fetchRealRoutesWithDiagnostics(source, destination, mode);
+  return result.routes;
+}
 
-  try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`OSRM routing failed: status ${res.status}`);
-    }
-
-    const data = await res.json();
-    if (!data.routes || data.routes.length === 0) {
-      return [];
-    }
-
-    const routes: RouteOption[] = data.routes.map((r: any, idx: number) => {
-      // GeoJSON returns [lng, lat] -> convert to Leaflet [lat, lng]
-      const polylineCoords: [number, number][] = r.geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]);
-      
-      const steps: RouteStep[] = [];
-      if (r.legs && r.legs[0]?.steps) {
-        r.legs[0].steps.forEach((st: any) => {
-          const name = st.name || st.maneuver?.type || 'Road';
-          steps.push({
-            instruction: name,
-            distance: st.distance,
-            duration: st.duration,
-            location: [st.maneuver.location[1], st.maneuver.location[0]]
-          });
-        });
-      }
-
-      // Transit notice if mode is bus or train
-      let transitNotice: string | undefined = undefined;
-      let adjustedDuration = r.duration;
-
-      if (mode === 'bus') {
-        transitNotice = "Public transit timetables unavailable with current routing provider. Road network estimated with typical city transit speed factor (1.25x).";
-        adjustedDuration = Math.round(r.duration * 1.25);
-      } else if (mode === 'train') {
-        transitNotice = "Direct railway network scheduling unavailable with current routing provider. Road-corridor estimate provided.";
-        adjustedDuration = Math.round(r.duration * 1.1);
-      }
-
-      let routeName: 'Fastest' | 'Shortest' | 'Alternative' = 'Fastest';
-      if (idx === 1) routeName = 'Shortest';
-      else if (idx > 1) routeName = 'Alternative';
-
-      return {
-        id: `route-${idx}-${Math.round(r.distance)}`,
-        name: routeName,
-        distance: Math.round(r.distance),
-        duration: Math.round(adjustedDuration),
-        coordinates: polylineCoords,
-        steps,
-        summary: r.legs?.[0]?.summary || `Route via ${steps[0]?.instruction || 'Main Road'}`,
-        transitNotice
-      };
-    });
-
-    return routes;
-  } catch (error) {
-    console.error('OSRM route fetch error:', error);
-    // Return empty array on failure; no fake fallback routes!
-    return [];
+export async function fetchRealRoutesWithDiagnostics(
+  source: LocationPlace,
+  destination: LocationPlace,
+  mode: TravelMode
+): Promise<RoutingFetchResult> {
+  if (!isValidCoordinate(source.lat, source.lng) || !isValidCoordinate(destination.lat, destination.lng)) {
+    return {
+      routes: [],
+      error: 'Invalid coordinates provided for route calculation.'
+    };
   }
+
+  // Prevent zero-distance routing requests
+  const directDistance = calculateHaversineDistance(source.lat, source.lng, destination.lat, destination.lng);
+  if (directDistance < 15) {
+    return {
+      routes: [],
+      error: 'Origin and destination are at the exact same location (under 15m).'
+    };
+  }
+
+  const profile = OSRM_PROFILES[mode] || 'driving';
+  const coordinates = `${source.lng},${source.lat};${destination.lng},${destination.lat}`;
+
+  // Primary and fallback routing provider endpoints
+  const endpoints = [
+    `https://router.project-osrm.org/route/v1/${profile}/${coordinates}?overview=full&geometries=geojson&steps=true&alternatives=true`,
+    `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coordinates}?overview=full&geometries=geojson&steps=true&alternatives=false`
+  ];
+
+  let lastErrorMessage = 'Routing provider connection failed';
+
+  for (const url of endpoints) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 9000); // 9-second timeout
+
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        lastErrorMessage = res.status === 429
+          ? 'Routing service rate limit reached (HTTP 429). Please wait a moment.'
+          : `Routing service returned HTTP status ${res.status}.`;
+        continue; // Try next endpoint
+      }
+
+      const data = await res.json();
+      if (!data.routes || data.routes.length === 0) {
+        lastErrorMessage = data.message || 'No navigable road route found between selected points.';
+        continue;
+      }
+
+      const routes: RouteOption[] = data.routes.map((r: any, idx: number) => {
+        // GeoJSON coordinates are [lng, lat] -> convert to Leaflet [lat, lng]
+        const polylineCoords: [number, number][] = (r.geometry?.coordinates || [])
+          .filter((c: [number, number]) => isValidCoordinate(c[1], c[0]))
+          .map((c: [number, number]) => [c[1], c[0]]);
+
+        const steps: RouteStep[] = [];
+        if (r.legs && r.legs[0]?.steps) {
+          r.legs[0].steps.forEach((st: any) => {
+            const name = st.name || st.maneuver?.type || 'Road';
+            if (st.maneuver?.location && isValidCoordinate(st.maneuver.location[1], st.maneuver.location[0])) {
+              steps.push({
+                instruction: name,
+                distance: Math.round(st.distance || 0),
+                duration: Math.round(st.duration || 0),
+                location: [st.maneuver.location[1], st.maneuver.location[0]]
+              });
+            }
+          });
+        }
+
+        // Transit speed adjustment annotations
+        let transitNotice: string | undefined = undefined;
+        let adjustedDuration = r.duration;
+
+        if (mode === 'bus') {
+          transitNotice = 'Public transit timetables estimated via standard urban bus speed factor (1.25x).';
+          adjustedDuration = Math.round(r.duration * 1.25);
+        } else if (mode === 'train') {
+          transitNotice = 'Railway corridor road estimate; actual train schedule may differ.';
+          adjustedDuration = Math.round(r.duration * 1.1);
+        }
+
+        let routeName: 'Fastest' | 'Shortest' | 'Alternative' = 'Fastest';
+        if (idx === 1) routeName = 'Shortest';
+        else if (idx > 1) routeName = 'Alternative';
+
+        return {
+          id: `route-${idx}-${Math.round(r.distance)}`,
+          name: routeName,
+          distance: Math.round(r.distance),
+          duration: Math.round(adjustedDuration),
+          coordinates: polylineCoords,
+          steps,
+          summary: r.legs?.[0]?.summary || `Route via ${steps[0]?.instruction || 'Main Road'}`,
+          transitNotice
+        };
+      });
+
+      return { routes };
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        lastErrorMessage = 'Routing request timed out (server unreachable).';
+      } else {
+        lastErrorMessage = error.message || 'Network error connecting to routing provider.';
+      }
+    }
+  }
+
+  // If both endpoints failed, return empty routes with exact error diagnosis
+  return {
+    routes: [],
+    error: lastErrorMessage
+  };
 }
 
 // Extract real named stops and POIs along the route from step instructions and destination
@@ -201,7 +285,6 @@ export function extractStopsFromRoute(route: RouteOption, destination: LocationP
   const stops: StopInfo[] = [];
   let accumDistance = 0;
 
-  // Filter meaningful street names and landmarks
   const uniqueNames = new Set<string>();
 
   route.steps.forEach((step, idx) => {
@@ -213,7 +296,7 @@ export function extractStopsFromRoute(route: RouteOption, destination: LocationP
       clean !== 'depart' &&
       clean !== 'arrive' &&
       !uniqueNames.has(clean) &&
-      step.distance > 150 // meaningful segment
+      step.distance > 150
     ) {
       uniqueNames.add(clean);
       stops.push({
@@ -228,7 +311,6 @@ export function extractStopsFromRoute(route: RouteOption, destination: LocationP
     }
   });
 
-  // Always append destination as final stop
   stops.push({
     id: 'dest-stop',
     name: destination.name,
